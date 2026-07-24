@@ -1,0 +1,4 @@
+workflow: onboarding
+source: jira
+claude_md:
+  strategy: append
