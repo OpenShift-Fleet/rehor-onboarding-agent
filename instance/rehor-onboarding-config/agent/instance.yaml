@@ -1,4 +1,6 @@
 workflow: onboarding
 source: jira
+envs:
+  - _none  # no-op — prevents install-envs.sh from installing all presets (remove after upstream fix)
 claude_md:
   strategy: append
