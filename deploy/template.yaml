@@ -4,7 +4,7 @@ metadata:
   name: rehor-onboarding-agent-dev
 parameters:
 - name: NAMESPACE
-  value: ${{NAMESPACE}}
+  value: ${NAMESPACE}
 - name: BOT_IMAGE
   value: quay.io/redhat-services-prod/hcc-platex-services/rehor-onboarding-agent
 - name: IMAGE_TAG
@@ -39,26 +39,26 @@ objects:
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
-    name: ${{BOT_NAME}}
+    name: ${BOT_NAME}
     labels:
-      app.kubernetes.io/name: ${{BOT_NAME}}
+      app.kubernetes.io/name: ${BOT_NAME}
       app.kubernetes.io/component: bot
       app.kubernetes.io/part-of: devbot
   spec:
     replicas: ${{BOT_REPLICAS}}
     selector:
       matchLabels:
-        app.kubernetes.io/name: ${{BOT_NAME}}
+        app.kubernetes.io/name: ${BOT_NAME}
     template:
       metadata:
         labels:
-          app.kubernetes.io/name: ${{BOT_NAME}}
+          app.kubernetes.io/name: ${BOT_NAME}
           app.kubernetes.io/component: bot
           app.kubernetes.io/part-of: devbot
       spec:
         containers:
         - name: bot
-          image: ${{BOT_IMAGE}}:${{IMAGE_TAG}}
+          image: ${BOT_IMAGE}:${IMAGE_TAG}
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
@@ -68,7 +68,7 @@ objects:
               drop: ["ALL"]
           env:
           - name: BOT_LABEL
-            value: ${{BOT_LABEL}}
+            value: ${BOT_LABEL}
           - name: BOT_MEMORY_URL
             value: http://devbot-memory-server:8080/mcp
           - name: BOT_MEMORY_HEALTH_URL
@@ -113,17 +113,17 @@ objects:
                 name: devbot-secrets
                 key: jira-email
           - name: BOT_INSTANCE_ID
-            value: ${{BOT_INSTANCE_ID}}
+            value: ${BOT_INSTANCE_ID}
           - name: BOT_CONFIG_REPO
-            value: ${{BOT_CONFIG_REPO}}
+            value: ${BOT_CONFIG_REPO}
           - name: BOT_CONFIG_PATH
-            value: ${{BOT_CONFIG_PATH}}
+            value: ${BOT_CONFIG_PATH}
           - name: BOT_DASHBOARD_URL
             value: http://devbot-memory-server:8080/api/bot-status
           - name: COSTS_API_URL
             value: http://devbot-memory-server:8080/api/costs
           - name: SLACK_WEBHOOK_URL
-            value: ${{SLACK_WEBHOOK_URL}}
+            value: ${SLACK_WEBHOOK_URL}
           - name: PROXY_HOST
             value: devbot-proxy
           - name: HTTP_PROXY
@@ -156,13 +156,13 @@ objects:
 - apiVersion: networking.k8s.io/v1
   kind: NetworkPolicy
   metadata:
-    name: ${{BOT_NAME}}-egress
+    name: ${BOT_NAME}-egress
     labels:
       app.kubernetes.io/part-of: devbot
   spec:
     podSelector:
       matchLabels:
-        app.kubernetes.io/name: ${{BOT_NAME}}
+        app.kubernetes.io/name: ${BOT_NAME}
     policyTypes:
     - Egress
     egress:
@@ -202,15 +202,15 @@ objects:
 - apiVersion: keda.sh/v1alpha1
   kind: ScaledObject
   metadata:
-    name: ${{BOT_NAME}}-cron-scaler
+    name: ${BOT_NAME}-cron-scaler
     labels:
-      app.kubernetes.io/name: ${{BOT_NAME}}
+      app.kubernetes.io/name: ${BOT_NAME}
       app.kubernetes.io/part-of: devbot
   spec:
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
-      name: ${{BOT_NAME}}
+      name: ${BOT_NAME}
     minReplicaCount: 0
     maxReplicaCount: 1
     triggers:
