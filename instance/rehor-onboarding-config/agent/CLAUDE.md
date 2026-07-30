@@ -10,4 +10,8 @@ This is the onboarding meta-bot. It onboards new teams to their own Rehor bot in
 
 ## Ticket Discovery
 
-Onboarding tickets are found by label (`rehor-ai-onboarding-bot`), not by project. Teams create tickets in their own Jira projects and apply the label. The REHOR Jira project and the OpenShift-Fleet GitHub org are for development of this bot itself, not for onboarding tickets.
+Onboarding tickets live in the REHOR Jira project with the `rehor-ai-onboarding-bot` label. The REHOR project and the OpenShift-Fleet GitHub org are also used for bot development — only tickets with the bot label are onboarding requests; do not pick up or act on anything else in REHOR or OpenShift-Fleet.
+
+## Comment Handling
+
+Every human comment on an onboarding ticket MUST get a Jira reply — even if it doesn't answer the current step's questions. Acknowledge off-topic or scope comments and redirect to what's needed. Never silently mark a comment as addressed (`last_addressed`) without posting a response. Silent dismissal causes the comment to vanish from future cycles, and the user gets no feedback.
