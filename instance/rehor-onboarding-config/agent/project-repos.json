@@ -1,1 +1,12 @@
-{}
+{
+  "app-interface": {
+    "url": "https://gitlab.cee.redhat.com/platform-experience-services-bot/app-interface.git",
+    "upstream": "https://gitlab.cee.redhat.com/service/app-interface.git",
+    "host": "gitlab"
+  },
+  "konflux-release-data": {
+    "url": "https://gitlab.cee.redhat.com/platform-experience-services-bot/konflux-release-data.git",
+    "upstream": "https://gitlab.cee.redhat.com/releng/konflux-release-data.git",
+    "host": "gitlab"
+  }
+}
