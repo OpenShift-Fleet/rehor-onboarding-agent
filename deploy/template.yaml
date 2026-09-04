@@ -31,13 +31,27 @@ parameters:
   value: ""
 objects:
 
-# Bot-only deployment for rehor-onboarding-agent-dev runner instance.
-# Shared infrastructure (proxy, memory-server, secrets) deployed by
-# platform-frontend-ai-dev template in the same namespace.
+# Bot-only workload for the rehor-onboarding-agent-dev runner instance.
+# The bot runs as an OpenShell agent-sandbox Sandbox (via SandboxWarmPool),
+# not a Deployment. Shared infrastructure (proxy, memory-server, secrets) is
+# deployed by the platform-frontend-ai-dev template in the same namespace.
 
-# --- Bot Deployment ---
-- apiVersion: apps/v1
-  kind: Deployment
+# --- Sandbox workload (OpenShell / agent-sandbox) ---
+# The bot runs as a SandboxWarmPool member (agents.x-k8s.io Sandbox), not a
+# Deployment. A warm-pool member runs the image entrypoint immediately
+# (Sandbox operatingMode defaults to Running); no SandboxClaim is involved.
+# KEDA scales the pool's /scale subresource (see ScaledObject below):
+# replicas=1 during the cron window = one running bot, replicas=0 off-window.
+#
+# NOTE (REHOR-119, migrate-first): securityContext is carried over unchanged
+# from the prior Deployment. readOnlyRootFilesystem + writable-mount hardening
+# is a tracked follow-up — this bot writes into /home/botuser/app at startup
+# (git config via GIT_CONFIG_GLOBAL, skill merge into .claude, repo clones),
+# so read-only root needs dedicated write-path mounts, not the generic PoC set.
+#
+# --- SandboxTemplate (pod blueprint referenced by the warm pool) ---
+- apiVersion: extensions.agents.x-k8s.io/v1beta1
+  kind: SandboxTemplate
   metadata:
     name: ${BOT_NAME}
     labels:
@@ -45,11 +59,7 @@ objects:
       app.kubernetes.io/component: bot
       app.kubernetes.io/part-of: devbot
   spec:
-    replicas: ${{BOT_REPLICAS}}
-    selector:
-      matchLabels:
-        app.kubernetes.io/name: ${BOT_NAME}
-    template:
+    podTemplate:
       metadata:
         labels:
           app.kubernetes.io/name: ${BOT_NAME}
@@ -152,6 +162,22 @@ objects:
               memory: 4Gi
               ephemeral-storage: 8Gi
 
+# --- SandboxWarmPool (KEDA scale target; each replica = one running bot) ---
+- apiVersion: extensions.agents.x-k8s.io/v1beta1
+  kind: SandboxWarmPool
+  metadata:
+    name: ${BOT_NAME}
+    labels:
+      app.kubernetes.io/name: ${BOT_NAME}
+      app.kubernetes.io/component: bot
+      app.kubernetes.io/part-of: devbot
+  spec:
+    # KEDA owns this at runtime via the /scale subresource; the initial value
+    # mirrors the prior Deployment (0 = scaled down until the cron window).
+    replicas: ${{BOT_REPLICAS}}
+    sandboxTemplateRef:
+      name: ${BOT_NAME}
+
 # --- NetworkPolicy: Bot can only reach proxy + memory-server ---
 - apiVersion: networking.k8s.io/v1
   kind: NetworkPolicy
@@ -208,8 +234,8 @@ objects:
       app.kubernetes.io/part-of: devbot
   spec:
     scaleTargetRef:
-      apiVersion: apps/v1
-      kind: Deployment
+      apiVersion: extensions.agents.x-k8s.io/v1beta1
+      kind: SandboxWarmPool
       name: ${BOT_NAME}
     minReplicaCount: 0
     maxReplicaCount: 1
