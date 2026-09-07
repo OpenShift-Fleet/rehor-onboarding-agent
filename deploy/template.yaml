@@ -29,6 +29,18 @@ parameters:
   required: true
 - name: SLACK_WEBHOOK_URL
   value: ""
+- name: KEDA_EU_TIMEZONE
+  value: Europe/Prague
+- name: KEDA_EU_CRON_START
+  value: "0 8 * * 1-5"
+- name: KEDA_EU_CRON_END
+  value: "0 18 * * 1-5"
+- name: KEDA_US_TIMEZONE
+  value: America/New_York
+- name: KEDA_US_CRON_START
+  value: "0 9 * * 1-5"
+- name: KEDA_US_CRON_END
+  value: "0 18 * * 1-5"
 objects:
 
 # Bot-only workload for the rehor-onboarding-agent-dev runner instance.
@@ -59,6 +71,65 @@ objects:
       app.kubernetes.io/component: bot
       app.kubernetes.io/part-of: devbot
   spec:
+    networkPolicyManagement: Managed
+    networkPolicy:
+      ingress:
+      - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: agent-sandbox-system
+          podSelector:
+            matchLabels:
+              app: sandbox-router
+      egress:
+      - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: devbot-proxy
+        ports:
+        - port: 3128
+          protocol: TCP
+        - port: 9090
+          protocol: TCP
+        - port: 8443
+          protocol: TCP
+        - port: 8444
+          protocol: TCP
+        - port: 8446
+          protocol: TCP
+        - port: 8447
+          protocol: TCP
+        - port: 8448
+          protocol: TCP
+      - to:
+        - podSelector:
+            app.kubernetes.io/name: memory-server
+        ports:
+        - port: 8080
+          protocol: TCP
+      - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+        ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+      - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+            - 169.254.0.0/16
+      - to:
+        - ipBlock:
+            cidr: ::/0
+            except:
+            - fc00::/7
+            - fe80::/10
     podTemplate:
       metadata:
         labels:
@@ -66,6 +137,7 @@ objects:
           app.kubernetes.io/component: bot
           app.kubernetes.io/part-of: devbot
       spec:
+        dnsPolicy: ClusterFirst
         containers:
         - name: bot
           image: ${BOT_IMAGE}:${IMAGE_TAG}
@@ -178,52 +250,6 @@ objects:
     sandboxTemplateRef:
       name: ${BOT_NAME}
 
-# --- NetworkPolicy: Bot can only reach proxy + memory-server ---
-- apiVersion: networking.k8s.io/v1
-  kind: NetworkPolicy
-  metadata:
-    name: ${BOT_NAME}-egress
-    labels:
-      app.kubernetes.io/part-of: devbot
-  spec:
-    podSelector:
-      matchLabels:
-        app.kubernetes.io/name: ${BOT_NAME}
-    policyTypes:
-    - Egress
-    egress:
-    - to:
-      - podSelector:
-          matchLabels:
-            app.kubernetes.io/name: devbot-proxy
-      ports:
-      - port: 3128
-        protocol: TCP
-      - port: 9090
-        protocol: TCP
-      - port: 8443
-        protocol: TCP
-      - port: 8444
-        protocol: TCP
-      - port: 8446
-        protocol: TCP
-    - to:
-      - podSelector:
-          matchLabels:
-            app.kubernetes.io/name: memory-server
-      ports:
-      - port: 8080
-        protocol: TCP
-    - to:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: openshift-dns
-      ports:
-      - port: 5353
-        protocol: UDP
-      - port: 5353
-        protocol: TCP
-
 # --- Cron Scaler ---
 - apiVersion: keda.sh/v1alpha1
   kind: ScaledObject
@@ -242,7 +268,13 @@ objects:
     triggers:
     - type: cron
       metadata:
-        timezone: "America/New_York"
-        start: "0 9 * * 1-5"
-        end: "0 18 * * 1-5"
+        timezone: ${KEDA_EU_TIMEZONE}
+        start: ${KEDA_EU_CRON_START}
+        end: ${KEDA_EU_CRON_END}
+        desiredReplicas: "1"
+    - type: cron
+      metadata:
+        timezone: ${KEDA_US_TIMEZONE}
+        start: ${KEDA_US_CRON_START}
+        end: ${KEDA_US_CRON_END}
         desiredReplicas: "1"
