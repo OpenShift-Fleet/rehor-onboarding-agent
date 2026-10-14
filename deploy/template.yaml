@@ -103,7 +103,8 @@ objects:
           protocol: TCP
       - to:
         - podSelector:
-            app.kubernetes.io/name: memory-server
+            matchLabels:
+              app.kubernetes.io/name: memory-server
         ports:
         - port: 8080
           protocol: TCP
