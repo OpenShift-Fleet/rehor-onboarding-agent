@@ -1,5 +1,10 @@
 workflow: onboarding
 source: jira
+# OpenCode canary (REHOR-167). Needs BOT_EXECUTION_ENGINE=coordinator on the
+# runner; reasoning effort comes from ../opencode-deployment.json.
+runtime: opencode-v1
+provider: rehor-openai
+model: gpt-6.1-sol
 envs:
   - _none  # no-op — prevents install-envs.sh from installing all presets (remove after upstream fix)
 claude_md:
