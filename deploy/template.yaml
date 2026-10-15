@@ -29,6 +29,10 @@ parameters:
   required: true
 - name: SLACK_WEBHOOK_URL
   value: ""
+# Runner engine: python (legacy) or coordinator (TypeScript coordinator, needed
+# for the OpenCode runtime selected in instance.yaml).
+- name: BOT_EXECUTION_ENGINE
+  value: python
 - name: KEDA_EU_TIMEZONE
   value: Europe/Prague
 - name: KEDA_EU_CRON_START
@@ -101,9 +105,13 @@ objects:
           protocol: TCP
         - port: 8448
           protocol: TCP
+        # OpenAI-compatible model gateway; used only by coordinator/OpenCode runners.
+        - port: 8450
+          protocol: TCP
       - to:
         - podSelector:
-            app.kubernetes.io/name: memory-server
+            matchLabels:
+              app.kubernetes.io/name: memory-server
         ports:
         - port: 8080
           protocol: TCP
@@ -204,6 +212,12 @@ objects:
             value: http://devbot-memory-server:8080/api/bot-status
           - name: COSTS_API_URL
             value: http://devbot-memory-server:8080/api/costs
+          - name: CYCLE_RUNS_API_URL
+            value: http://devbot-memory-server:8080/api/cycle-runs
+          - name: BOT_EXECUTION_ENGINE
+            value: ${BOT_EXECUTION_ENGINE}
+          - name: REHOR_OPENCODE_DEPLOYMENT_CONFIG
+            value: /home/botuser/app/instance/rehor-onboarding-config/opencode-deployment.json
           - name: SLACK_WEBHOOK_URL
             value: ${SLACK_WEBHOOK_URL}
           - name: PROXY_HOST
