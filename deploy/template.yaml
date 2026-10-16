@@ -218,6 +218,14 @@ objects:
             value: ${BOT_EXECUTION_ENGINE}
           - name: REHOR_OPENCODE_DEPLOYMENT_CONFIG
             value: /home/botuser/app/instance/rehor-onboarding-config/opencode-deployment.json
+          # The writable image worktree is owned by botuser, not OpenShift's arbitrary runtime UID.
+          - name: REHOR_WORKSPACE_OWNER_UID
+            value: "1000"
+          - name: REHOR_MODEL_PROXY_URL
+            value: http://devbot-proxy:8450/v1
+          # Non-secret client placeholder; the proxy injects the upstream API key.
+          - name: REHOR_MODEL_PROXY_TOKEN
+            value: rehor-runtime
           - name: SLACK_WEBHOOK_URL
             value: ${SLACK_WEBHOOK_URL}
           - name: PROXY_HOST
