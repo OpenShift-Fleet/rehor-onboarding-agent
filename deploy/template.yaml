@@ -16,23 +16,23 @@ parameters:
 - name: BOT_INSTANCE_ID
   value: ""
 - name: BOT_CONFIG_REPO
-  value: ""
+  required: true
 - name: BOT_NAME
   value: devbot-onboarding
 - name: BOT_CONFIG_PATH
-  value: ""
-- name: GCP_PROJECT_ID
-  required: true
-- name: GCP_REGION
-  required: true
-- name: VERTEX_ALLOWED_MODELS
   required: true
 - name: SLACK_WEBHOOK_URL
   value: ""
-# Runner engine: python (legacy) or coordinator (TypeScript coordinator, needed
-# for the OpenCode runtime selected in instance.yaml).
+# TypeScript coordinator launches the native OpenCode runtime in instance.yaml.
 - name: BOT_EXECUTION_ENGINE
-  value: python
+  required: true
+- name: REHOR_OPENCODE_DEPLOYMENT_CONFIG
+  required: true
+- name: REHOR_MODEL_PROXY_URL
+  required: true
+# Non-secret client placeholder; the proxy injects the upstream API key.
+- name: REHOR_MODEL_PROXY_TOKEN
+  required: true
 - name: KEDA_EU_TIMEZONE
   value: Europe/Prague
 - name: KEDA_EU_CRON_START
@@ -165,14 +165,6 @@ objects:
             value: http://devbot-memory-server:8080/health
           - name: BOT_MEMORY_HEALTH_TIMEOUT
             value: "120"
-          - name: CLAUDE_CODE_SKIP_VERTEX_AUTH
-            value: "true"
-          - name: ANTHROPIC_VERTEX_BASE_URL
-            value: http://devbot-proxy:8443
-          - name: ANTHROPIC_VERTEX_PROJECT_ID
-            value: dummy-project
-          - name: CLOUD_ML_REGION
-            value: global
           - name: EXECUTOR_ADDR
             value: devbot-proxy:9090
           - name: HUSKY
@@ -217,15 +209,15 @@ objects:
           - name: BOT_EXECUTION_ENGINE
             value: ${BOT_EXECUTION_ENGINE}
           - name: REHOR_OPENCODE_DEPLOYMENT_CONFIG
-            value: /home/botuser/app/instance/rehor-onboarding-config/opencode-deployment.json
+            value: ${REHOR_OPENCODE_DEPLOYMENT_CONFIG}
           # The writable image worktree is owned by botuser, not OpenShift's arbitrary runtime UID.
           - name: REHOR_WORKSPACE_OWNER_UID
             value: "1000"
           - name: REHOR_MODEL_PROXY_URL
-            value: http://devbot-proxy:8450/v1
+            value: ${REHOR_MODEL_PROXY_URL}
           # Non-secret client placeholder; the proxy injects the upstream API key.
           - name: REHOR_MODEL_PROXY_TOKEN
-            value: rehor-runtime
+            value: ${REHOR_MODEL_PROXY_TOKEN}
           - name: SLACK_WEBHOOK_URL
             value: ${SLACK_WEBHOOK_URL}
           - name: PROXY_HOST
