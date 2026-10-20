@@ -16,24 +16,23 @@ parameters:
 - name: BOT_INSTANCE_ID
   value: ""
 - name: BOT_CONFIG_REPO
-  value: https://github.com/OpenShift-Fleet/rehor-onboarding-agent.git
+  required: true
 - name: BOT_NAME
   value: devbot-onboarding
 - name: BOT_CONFIG_PATH
-  value: instance/rehor-onboarding-config
-# Accepted for external app-interface parameter sets; unused by this bot-only
-# template. GCP/Vertex configuration belongs to the separately deployed proxy.
-- name: GCP_PROJECT_ID
-  value: ""
-- name: GCP_REGION
-  value: ""
-- name: VERTEX_ALLOWED_MODELS
-  value: ""
+  required: true
 - name: SLACK_WEBHOOK_URL
   value: ""
 # TypeScript coordinator launches the native OpenCode runtime in instance.yaml.
 - name: BOT_EXECUTION_ENGINE
-  value: coordinator
+  required: true
+- name: REHOR_OPENCODE_DEPLOYMENT_CONFIG
+  required: true
+- name: REHOR_MODEL_PROXY_URL
+  required: true
+# Non-secret client placeholder; the proxy injects the upstream API key.
+- name: REHOR_MODEL_PROXY_TOKEN
+  required: true
 - name: KEDA_EU_TIMEZONE
   value: Europe/Prague
 - name: KEDA_EU_CRON_START
@@ -210,15 +209,15 @@ objects:
           - name: BOT_EXECUTION_ENGINE
             value: ${BOT_EXECUTION_ENGINE}
           - name: REHOR_OPENCODE_DEPLOYMENT_CONFIG
-            value: /home/botuser/app/instance/rehor-onboarding-config/opencode-deployment.json
+            value: ${REHOR_OPENCODE_DEPLOYMENT_CONFIG}
           # The writable image worktree is owned by botuser, not OpenShift's arbitrary runtime UID.
           - name: REHOR_WORKSPACE_OWNER_UID
             value: "1000"
           - name: REHOR_MODEL_PROXY_URL
-            value: http://devbot-proxy:8450/v1
+            value: ${REHOR_MODEL_PROXY_URL}
           # Non-secret client placeholder; the proxy injects the upstream API key.
           - name: REHOR_MODEL_PROXY_TOKEN
-            value: rehor-runtime
+            value: ${REHOR_MODEL_PROXY_TOKEN}
           - name: SLACK_WEBHOOK_URL
             value: ${SLACK_WEBHOOK_URL}
           - name: PROXY_HOST

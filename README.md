@@ -37,9 +37,9 @@ git commit -m "chore: bump dev-bot submodule"
 - [`opencode-deployment.json`](instance/rehor-onboarding-config/opencode-deployment.json) configures both models through the bundled `@ai-sdk/openai` Responses adapter. All roles explicitly use `reasoningEffort: medium` (ordinary/normal), including Luna implementation roles. The pinned OpenCode binary owns the bundled adapter version; the package declaration is build metadata.
 - Keep the `_none` env sentinel: an empty env list makes `entrypoint.sh` run every preset entrypoint.
 
-[`deploy/template.yaml`](deploy/template.yaml) defaults `BOT_EXECUTION_ENGINE` to `coordinator`, `BOT_CONFIG_REPO` to this public GitHub repository, and `BOT_CONFIG_PATH` to `instance/rehor-onboarding-config`. External deployment parameters can override these defaults. The coordinator syncs the remote profile at runtime; the baked `instance/` directory is not a runtime profile fallback.
+App-interface supplies `BOT_CONFIG_REPO`, `BOT_CONFIG_PATH`, `BOT_EXECUTION_ENGINE`, `REHOR_OPENCODE_DEPLOYMENT_CONFIG`, `REHOR_MODEL_PROXY_URL`, and `REHOR_MODEL_PROXY_TOKEN` through the `rehor-onboarding-agent` target in `data/services/insights/platform-frontend-ai-dev/deploy.yml`. [`deploy/template.yaml`](deploy/template.yaml) requires these parameters without defaults. The proxy token is a non-secret client placeholder; the real OpenAI API key stays on the shared proxy. The coordinator syncs the remote profile at runtime; the baked `instance/` directory is not a runtime profile fallback.
 
-The model gateway remains `http://devbot-proxy:8450/v1`. GCP/Vertex parameters are optional, unused inputs accepted for external app-interface parameter sets; shared proxy configuration is managed separately.
+The model gateway remains `http://devbot-proxy:8450/v1`. This OpenAI-only onboarding template and its app-interface target do not declare GCP/Vertex parameters. The separately deployed shared proxy retains its GCP/Vertex configuration for other bots.
 
 The shared proxy's `OPENAI_ALLOWED_MODELS` must include **both `gpt-6.1-sol` and `gpt-6-luna`**. Add missing models while preserving other shared allowlist entries. `VERTEX_ALLOWED_MODELS` does not authorize these OpenAI routes.
 
