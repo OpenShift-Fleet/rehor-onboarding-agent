@@ -28,6 +28,8 @@ parameters:
   required: true
 - name: REHOR_OPENCODE_DEPLOYMENT_CONFIG
   required: true
+- name: REHOR_OPENCODE_MAX_TOOL_CALLS
+  required: true
 - name: REHOR_MODEL_PROXY_URL
   required: true
 # Non-secret client placeholder; the proxy injects the upstream API key.
@@ -210,6 +212,8 @@ objects:
             value: ${BOT_EXECUTION_ENGINE}
           - name: REHOR_OPENCODE_DEPLOYMENT_CONFIG
             value: ${REHOR_OPENCODE_DEPLOYMENT_CONFIG}
+          - name: REHOR_OPENCODE_MAX_TOOL_CALLS
+            value: ${REHOR_OPENCODE_MAX_TOOL_CALLS}
           # The writable image worktree is owned by botuser, not OpenShift's arbitrary runtime UID.
           - name: REHOR_WORKSPACE_OWNER_UID
             value: "1000"
