@@ -7,4 +7,6 @@ runtime: opencode-v1
 provider: rehor-openai
 model: gpt-6.1-sol
 envs:
-  - _none  # no-op sentinel prevents entrypoint.sh from running all preset entrypoints
+  # Keep sentinel for install-envs.sh (build) and entrypoint.sh (runtime):
+  # empty envs currently skips installation but runs all runtime preset entrypoints.
+  - _none

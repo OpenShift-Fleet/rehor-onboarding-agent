@@ -35,7 +35,7 @@ git commit -m "chore: bump dev-bot submodule"
 - [`agent/AGENTS.md`](instance/rehor-onboarding-config/agent/AGENTS.md) supplies instance guidance alongside native core and onboarding workflow `AGENTS.md` instructions.
 - [`agent/opencode.json`](instance/rehor-onboarding-config/agent/opencode.json) selects `onboarding-coordinator` as the default primary agent and limits delegation to one level. Native role files live under [`agent/.opencode/agents/`](instance/rehor-onboarding-config/agent/.opencode/agents/).
 - [`opencode-deployment.json`](instance/rehor-onboarding-config/opencode-deployment.json) configures both models through the bundled `@ai-sdk/openai` Responses adapter. All roles explicitly use `reasoningEffort: medium` (ordinary/normal), including Luna implementation roles. The pinned OpenCode binary owns the bundled adapter version; the package declaration is build metadata.
-- Keep the `_none` env sentinel: an empty env list makes `entrypoint.sh` run every preset entrypoint.
+- Keep the `_none` env sentinel for `install-envs.sh` (build) and `entrypoint.sh` (runtime): an empty env list currently skips env installation but makes the runtime run every preset entrypoint.
 
 App-interface supplies `BOT_CONFIG_REPO`, `BOT_CONFIG_PATH`, `BOT_EXECUTION_ENGINE`, `REHOR_OPENCODE_DEPLOYMENT_CONFIG`, `REHOR_MODEL_PROXY_URL`, and `REHOR_MODEL_PROXY_TOKEN` through the `rehor-onboarding-agent` target in `data/services/insights/platform-frontend-ai-dev/deploy.yml`. [`deploy/template.yaml`](deploy/template.yaml) requires these parameters without defaults. The proxy token is a non-secret client placeholder; the real OpenAI API key stays on the shared proxy. The coordinator syncs the remote profile at runtime; the baked `instance/` directory is not a runtime profile fallback.
 
@@ -47,14 +47,14 @@ The shared proxy's `OPENAI_ALLOWED_MODELS` must include **both `gpt-6.1-sol` and
 
 | Agent | Model | Reasoning effort | Responsibility |
 |---|---|---|---|
-| `onboarding-coordinator` | `rehor-openai/gpt-6.1-sol` | `medium` | One ticket/one state step per cycle; delegation and all external mutations/publication |
+| `onboarding-coordinator` | `rehor-openai/gpt-6.1-sol` | `medium` | One ticket/one state step per cycle; accountable for delegation, epic selection/claims, phase/epic state transitions, and final completion |
 | `onboarding-researcher` | `rehor-openai/gpt-6.1-sol` | `medium` | Read-only repository/stack investigation |
-| `onboarding-instance-scaffolder` | `rehor-openai/gpt-6-luna` | `medium` | Local Phase 1 generation, edits, and checks |
-| `onboarding-konflux-implementer` | `rehor-openai/gpt-6-luna` | `medium` | Local Phase 2 Konflux changes and checks |
-| `onboarding-app-interface-implementer` | `rehor-openai/gpt-6-luna` | `medium` | Local Phase 3 app-interface changes and checks |
+| `onboarding-instance-scaffolder` | `rehor-openai/gpt-6-luna` | `medium` | Phase 1 context, generation, edits, checks, and explicitly assigned publication |
+| `onboarding-konflux-implementer` | `rehor-openai/gpt-6-luna` | `medium` | Phase 2 Konflux context, changes, checks, and explicitly assigned publication |
+| `onboarding-app-interface-implementer` | `rehor-openai/gpt-6-luna` | `medium` | Phase 3 app-interface context, changes, checks, and explicitly assigned publication |
 | `onboarding-reviewer` | `rehor-openai/gpt-6.1-sol` | `medium` | Independent read-only review before publication |
 
-The coordinator supplies scoped briefs and exact worktree paths, uses foreground implementation tasks, and resolves reviewer blockers before publishing. Workers cannot recursively delegate or directly use Jira/memory/browser MCP tools. Researchers/reviewers cannot edit or run Bash. Implementers retain inherited local edit/Bash access with direct publishing commands denied; scope and no-external-mutation instructions also apply to scripts and tests. These roles share the runtime, not hard-isolated subprocess sandboxes. No global read or external-directory permissions are widened.
+The coordinator supplies scoped briefs with workspace/output paths and a named owner for each external action, uses foreground tasks, and requests independent review before publication. After resolving review blockers, it may resume the implementer to publish reviewed changes and perform explicitly assigned relevant comments/memory updates. Workers gather context directly through Jira/memory/PR/MR/CI lookups; implementers may clone/branch and use skills, MCP, git, gh, and glab for assigned work. Researchers/reviewers retain edit denial and read-only scope, with Bash available for inspection and targeted checks. Workers report actions actually taken and their URLs; none may recursively delegate. The coordinator remains accountable for every required human-comment acknowledgment before recording it as addressed, end-of-cycle state/status bookkeeping, and the single-step limit. These roles inherit runner permissions and share the runtime, not hard-isolated subprocess sandboxes. No global permissions or shared runtime security boundaries are widened.
 
 ## Build and deploy
 
@@ -62,4 +62,10 @@ Konflux builds the runner image using the existing `.tekton/` pipelines, `dev-bo
 
 Image builds do not deploy the workload. App-interface separately applies `deploy/template.yaml` with the selected `BOT_IMAGE`/`IMAGE_TAG` and deployment parameters. The template runs the coordinator in a SandboxWarmPool with KEDA cron scaling; shared proxy, memory service, and secrets are deployed separately. Submodule and baked `opencode-deployment.json` changes require a new image and rollout; runtime profile guidance comes from the synced config repository.
 
-For this model/agent change, build and roll out the image containing the updated deployment provider models/effort. Publish profile changes to the configured config repository for runtime sync; `agent/opencode.json`, `AGENTS.md`, and native agent files are captured for subsequent cycles. Already-running OpenCode processes keep their loaded configuration; the next cycle starts a fresh process. Updating the shared proxy allowlist is a separate operation.
+Roll out this migration in order:
+
+1. Merge onboarding PR #29 first. Remote profile sync immediately exposes its profile changes to subsequent cycles.
+2. Merge companion app-interface MR !214687 second to supply the new template parameters.
+3. Roll out the built onboarding image containing the updated template and deployment provider models/effort.
+
+The temporary profile/parameter mismatch until the new template/image is live is explicitly accepted, including transient cycle failures. There is no compatibility window or rollback compatibility. Already-running OpenCode processes keep their loaded configuration; restart OpenCode to load changed configuration (the next cycle starts a fresh process). Updating the shared proxy allowlist is a separate operation.
