@@ -13,7 +13,14 @@
           "name": "GPT-6.1 Sol",
           "reasoning": true,
           "options": {
-            "reasoningEffort": "high"
+            "reasoningEffort": "medium"
+          }
+        },
+        "gpt-6-luna": {
+          "name": "GPT-6 Luna",
+          "reasoning": true,
+          "options": {
+            "reasoningEffort": "medium"
           }
         }
       }

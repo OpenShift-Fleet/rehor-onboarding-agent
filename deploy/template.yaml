@@ -16,23 +16,24 @@ parameters:
 - name: BOT_INSTANCE_ID
   value: ""
 - name: BOT_CONFIG_REPO
-  value: ""
+  value: https://github.com/OpenShift-Fleet/rehor-onboarding-agent.git
 - name: BOT_NAME
   value: devbot-onboarding
 - name: BOT_CONFIG_PATH
-  value: ""
+  value: instance/rehor-onboarding-config
+# Accepted for external app-interface parameter sets; unused by this bot-only
+# template. GCP/Vertex configuration belongs to the separately deployed proxy.
 - name: GCP_PROJECT_ID
-  required: true
+  value: ""
 - name: GCP_REGION
-  required: true
+  value: ""
 - name: VERTEX_ALLOWED_MODELS
-  required: true
+  value: ""
 - name: SLACK_WEBHOOK_URL
   value: ""
-# Runner engine: python (legacy) or coordinator (TypeScript coordinator, needed
-# for the OpenCode runtime selected in instance.yaml).
+# TypeScript coordinator launches the native OpenCode runtime in instance.yaml.
 - name: BOT_EXECUTION_ENGINE
-  value: python
+  value: coordinator
 - name: KEDA_EU_TIMEZONE
   value: Europe/Prague
 - name: KEDA_EU_CRON_START
@@ -165,14 +166,6 @@ objects:
             value: http://devbot-memory-server:8080/health
           - name: BOT_MEMORY_HEALTH_TIMEOUT
             value: "120"
-          - name: CLAUDE_CODE_SKIP_VERTEX_AUTH
-            value: "true"
-          - name: ANTHROPIC_VERTEX_BASE_URL
-            value: http://devbot-proxy:8443
-          - name: ANTHROPIC_VERTEX_PROJECT_ID
-            value: dummy-project
-          - name: CLOUD_ML_REGION
-            value: global
           - name: EXECUTOR_ADDR
             value: devbot-proxy:9090
           - name: HUSKY
