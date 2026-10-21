@@ -1,4 +1,9 @@
 {
+  "additionalDirectories": [
+    "/home/botuser/repos",
+    "/home/botuser/data",
+    "/tmp/opencode"
+  ],
   "providers": [
     {
       "id": "rehor-openai",
