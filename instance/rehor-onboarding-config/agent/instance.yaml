@@ -3,7 +3,7 @@ source: jira
 # Native OpenCode runtime, launched by BOT_EXECUTION_ENGINE=coordinator.
 # Loads core/workflow AGENTS.md plus this profile's agent/AGENTS.md natively.
 # Provider adapter and medium (normal) reasoning effort: ../opencode-deployment.json.
-runtime: opencode-v1
+runtime: opencode
 provider: rehor-openai
 model: gpt-6.1-sol
 envs:
