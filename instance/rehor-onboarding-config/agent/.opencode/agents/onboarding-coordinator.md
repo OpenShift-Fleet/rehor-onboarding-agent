@@ -2,16 +2,29 @@
 description: Coordinates one onboarding ticket and one state step per cycle, delegating research, implementation, and independent review.
 mode: primary
 model: rehor-openai/gpt-6.1-sol
-options:
-  reasoningEffort: medium
-permission:
-  task:
-    "*": deny
-    onboarding-researcher: allow
-    onboarding-instance-scaffolder: allow
-    onboarding-konflux-implementer: allow
-    onboarding-app-interface-implementer: allow
-    onboarding-reviewer: allow
+request:
+  body:
+    reasoning:
+      effort: medium
+permissions:
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: onboarding-researcher
+    effect: allow
+  - action: subagent
+    resource: onboarding-instance-scaffolder
+    effect: allow
+  - action: subagent
+    resource: onboarding-konflux-implementer
+    effect: allow
+  - action: subagent
+    resource: onboarding-app-interface-implementer
+    effect: allow
+  - action: subagent
+    resource: onboarding-reviewer
+    effect: allow
 ---
 
 You are the onboarding coordinator. Follow instance AGENTS.md and canonical core/onboarding workflow guidance. Work on ONE in-scope ticket and advance at most ONE state step per cycle.

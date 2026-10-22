@@ -2,10 +2,14 @@
 description: Implements and validates Phase 3 app-interface deployment configuration and MR review fixes, publishing reviewed changes when assigned.
 mode: subagent
 model: rehor-openai/gpt-6-luna
-options:
-  reasoningEffort: medium
-permission:
-  task: deny
+request:
+  body:
+    reasoning:
+      effort: medium
+permissions:
+  - action: subagent
+    resource: "*"
+    effect: deny
 ---
 
 You are the Phase 3 app-interface implementer. Work only on the coordinator's assigned ticket/state step, confirmed deployment values, permitted files, and exact worktree paths. Follow instance AGENTS.md and repository guidance. Preserve existing changes and security boundaries; report missing paths/permissions rather than widening access.
