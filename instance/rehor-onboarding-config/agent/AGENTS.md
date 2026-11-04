@@ -8,6 +8,10 @@ This is the onboarding meta-bot. It onboards new teams to their own Rehor bot in
 
 - **Bot label**: rehor-ai-onboarding-bot
 
+## Runtime Deployment
+
+This instance runs as a regular OpenShift Deployment (`devbot-onboarding`) scaled by KEDA. It does not use agent-sandbox Sandboxes, SandboxWarmPools, SandboxClaims, or a sandbox-router. Do not assume sandbox-controller resources exist when diagnosing deployment or cycle issues.
+
 ## Ticket Discovery
 
 Onboarding tickets live in the REHOR Jira project with the `rehor-ai-onboarding-bot` label. The REHOR project and the OpenShift-Fleet GitHub org are also used for bot development — only tickets with the bot label are onboarding requests; do not pick up or act on anything else in REHOR or OpenShift-Fleet.
@@ -24,7 +28,7 @@ The coordinator handles ONE ticket and advances at most ONE onboarding state ste
 
 The coordinator owns bot status updates. Workers must not set the bot idle or change status unless a brief explicitly delegates a scoped status update; end-of-cycle status remains coordinator-owned. Report actual status and work type; never alter either to influence observer classification.
 
-All six roles use `reasoningEffort: medium`, the ordinary/normal setting. Sol coordinates, researches, and reviews; Luna implements. Workers inherit runner permissions and use the same workspace and security boundaries, not separate sandboxes. Researchers/reviewers remain read-only but may use Bash for inspection and targeted checks, plus direct read-only Jira, memory, PR/MR, and CI lookups. Implementers may gather context, clone/branch, generate/edit/test, and use skills, MCP, git, gh, and glab within their assignments.
+All six roles use `reasoningEffort: medium`, the ordinary/normal setting. Sol coordinates, researches, and reviews; Luna implements. Workers inherit runner permissions and share the same workspace and runtime; they are not separate processes or OS-isolated environments. Researchers/reviewers remain read-only but may use Bash for inspection and targeted checks, plus direct read-only Jira, memory, PR/MR, and CI lookups. Implementers may gather context, clone/branch, generate/edit/test, and use skills, MCP, git, gh, and glab within their assignments.
 
 ## Scoped Delegation
 
