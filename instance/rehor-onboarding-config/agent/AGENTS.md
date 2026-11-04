@@ -12,6 +12,8 @@ This is the onboarding meta-bot. It onboards new teams to their own Rehor bot in
 
 This instance runs as a regular OpenShift Deployment (`devbot-onboarding`) scaled by KEDA. It does not use agent-sandbox Sandboxes, SandboxWarmPools, SandboxClaims, or a sandbox-router. Do not assume sandbox-controller resources exist when diagnosing deployment or cycle issues.
 
+The shared core guide includes conditional OpenShell filesystem guidance. It is not an enforced isolation boundary for this Deployment. Keep credential protections and scoped workspace behavior, but do not claim OpenShell mounts, sandbox enforcement, or controller support here. Core prohibitions on network commands through Bash remain policy; do not describe them as enforced by an OpenShell sandbox.
+
 ## Ticket Discovery
 
 Onboarding tickets live in the REHOR Jira project with the `rehor-ai-onboarding-bot` label. The REHOR project and the OpenShift-Fleet GitHub org are also used for bot development — only tickets with the bot label are onboarding requests; do not pick up or act on anything else in REHOR or OpenShift-Fleet.
