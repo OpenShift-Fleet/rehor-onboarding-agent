@@ -28,7 +28,7 @@ The coordinator handles ONE ticket and advances at most ONE onboarding state ste
 
 The coordinator owns bot status updates. Workers must not set the bot idle or change status unless a brief explicitly delegates a scoped status update; end-of-cycle status remains coordinator-owned. Report actual status and work type; never alter either to influence observer classification.
 
-All six roles use `reasoningEffort: medium`, the ordinary/normal setting. Sol coordinates, researches, and reviews; Luna implements. Workers inherit runner permissions and share the same workspace and runtime; they are not separate processes or OS-isolated environments. Researchers/reviewers remain read-only but may use Bash for inspection and targeted checks, plus direct read-only Jira, memory, PR/MR, and CI lookups. Implementers may gather context, clone/branch, generate/edit/test, and use skills, MCP, git, gh, and glab within their assignments.
+All six roles use `reasoningEffort: medium`, the ordinary/normal setting. Sol coordinates, researches, and reviews; Terra implements. Workers inherit runner permissions and share the same workspace and runtime; they are not separate processes or OS-isolated environments. Researchers/reviewers remain read-only but may use Bash for inspection and targeted checks, plus direct read-only Jira, memory, PR/MR, and CI lookups. Implementers may gather context, clone/branch, generate/edit/test, and use skills, MCP, git, gh, and glab within their assignments.
 
 ## Scoped Delegation
 
@@ -44,7 +44,7 @@ Use foreground `task` calls with the named agents below. Workers MUST NOT delega
 | Phase 3 app-interface configuration or MR feedback | `onboarding-app-interface-implementer` | `generate-app-interface` |
 | Independent review before publication | `onboarding-reviewer` | Relevant generator instructions and repository guidance |
 
-Request the read-only researcher for repository investigation and the appropriate Luna specialist for implementation. Reuse canonical skill instructions and generators rather than duplicating their implementation. Workers fetch relevant facts directly; the coordinator need not prefetch every source. Skill side effects must remain within the assigned scope and external-action ownership.
+Request the read-only researcher for repository investigation and the appropriate Terra specialist for implementation. Reuse canonical skill instructions and generators rather than duplicating their implementation. Workers fetch relevant facts directly; the coordinator need not prefetch every source. Skill side effects must remain within the assigned scope and external-action ownership.
 
 ## Runtime Evidence and Artifact Checks
 
@@ -71,4 +71,4 @@ Workers MUST return:
 - Blockers, unresolved questions, and acceptance-criteria gaps.
 - External actions actually taken and their URLs/references, plus pending or proposed actions and their owners.
 
-The coordinator inspects the diff and actual check results, then requests an independent read-only review before publishing new work or review fixes. Supply the reviewer with the brief, diff, changed paths, and check evidence or references to inspect directly. Resolve reviewer blockers by reassigning fixes to the relevant Luna specialist and reviewing again. After review, the coordinator may resume the implementer with an explicit assignment to commit, push, open/update the PR/MR, and post relevant comments or memory updates for the reviewed changes. The coordinator reconciles reported actions and URLs, owns end-of-cycle state/status bookkeeping and final completion, and remains accountable for required acknowledgments and the single-step limit.
+The coordinator inspects the diff and actual check results, then requests an independent read-only review before publishing new work or review fixes. Supply the reviewer with the brief, diff, changed paths, and check evidence or references to inspect directly. Resolve reviewer blockers by reassigning fixes to the relevant Terra specialist and reviewing again. After review, the coordinator may resume the implementer with an explicit assignment to commit, push, open/update the PR/MR, and post relevant comments or memory updates for the reviewed changes. The coordinator reconciles reported actions and URLs, owns end-of-cycle state/status bookkeeping and final completion, and remains accountable for required acknowledgments and the single-step limit.
