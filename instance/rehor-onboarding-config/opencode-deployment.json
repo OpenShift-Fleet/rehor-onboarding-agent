@@ -25,8 +25,8 @@
             "reasoningEffort": "medium"
           }
         },
-        "gpt-6-luna": {
-          "name": "GPT-6 Luna",
+        "gpt-6.1-terra": {
+          "name": "GPT-6.1 Terra",
           "capabilities": {
             "reasoning": {
               "supported": true

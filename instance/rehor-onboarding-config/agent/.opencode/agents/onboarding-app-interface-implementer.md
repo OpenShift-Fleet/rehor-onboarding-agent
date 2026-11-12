@@ -1,7 +1,7 @@
 ---
 description: Implements and validates Phase 3 app-interface deployment configuration and MR review fixes, publishing reviewed changes when assigned.
 mode: subagent
-model: rehor-openai/gpt-6-luna
+model: rehor-openai/gpt-6.1-terra
 request:
   body:
     reasoning:
